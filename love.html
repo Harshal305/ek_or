@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ram Mandir Lucky Draw</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    color: white;
+    text-align: center;
+    background-image: url("bg.jpg");
+    background-size: cover;
+}
+
+.overlay {
+    background: rgba(0,0,0,0.6);
+    min-height: 100vh;
+    padding-bottom: 30px;
+}
+
+h1 {
+    background: orange;
+    padding: 10px;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.pdf-btn { background: green; color: white; }
+.page-btn { background: blue; color: white; }
+
+table {
+    width: 95%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    background: white;
+    color: black;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+img {
+    width: 80px;
+    height: 60px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="overlay" id="printArea">
+
+<h1>🚩 श्री राम मंदिर लकी ड्रॉ बोरगांव खुर्द 205198489495+959+5🚩</h1>
+
+<button class="pdf-btn" onclick="downloadPDF()">Download PDF</button>
+
+<br>
+
+<button class="page-btn" onclick="prevPage()">⬅ Previous</button>
+<span id="pageInfo"></span>
+<button class="page-btn" onclick="nextPage()">Next ➡</button>
+
+<table>
+<thead>
+<tr>
+<th>No</th>
+<th>Prize</th>
+<th>Full Name</th>
+<th>Address</th>
+<th>Coupon</th>
+</tr>
+</thead>
+
+<tbody id="resultTable"></tbody>
+
+</table>
+
+</div>
+
+<!-- PDF Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+
+let allData = [];
+let currentPage = 1;
+let rowsPerPage = 10;
+
+// Load Data
+function loadData() {
+    fetch('data.json?nocache=' + new Date().getTime())
+    .then(res => res.json())
+    .then(data => {
+        allData = data;
+        displayData();
+    });
+}
+
+// Display Data with Pagination
+function displayData() {
+
+    let table = document.getElementById("resultTable");
+    table.innerHTML = "";
+
+    let start = (currentPage - 1) * rowsPerPage;
+    let end = start + rowsPerPage;
+
+    let pageData = allData.slice(start, end);
+
+    pageData.forEach((item, index) => {
+        let row = `
+        <tr>
+        <td>${start + index + 1}</td>
+        <td><img src="${item.prize}.jpg"></td>
+        <td>${item.name}</td>
+        <td>${item.add}</td>
+        <td>${item.coupon}</td>
+        </tr>`;
+        table.innerHTML += row;
+    });
+
+    document.getElementById("pageInfo").innerText =
+        `Page ${currentPage} of ${Math.ceil(allData.length / rowsPerPage)}`;
+}
+
+// Next Page
+function nextPage() {
+    if (currentPage < Math.ceil(allData.length / rowsPerPage)) {
+        currentPage++;
+        displayData();
+    }
+}
+
+// Previous Page
+function prevPage() {
+    if (currentPage > 1) {
+        currentPage--;
+        displayData();
+    }
+}
+
+// Download PDF
+function downloadPDF() {
+
+    let element = document.getElementById("printArea");
+
+    let opt = {
+        margin: 5,
+        filename: 'Ram_Mandir_Lucky_Draw.pdf',
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save();
+}
+
+// Initial Load
+loadData();
+
+// Auto refresh every 2 minutes
+setInterval(loadData, 120000);
+
+</script>
+
+</body>
+</html>
